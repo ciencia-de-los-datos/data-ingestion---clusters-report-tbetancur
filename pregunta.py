@@ -18,11 +18,11 @@ def ingest_data():
     list_column = df[:2].fillna('').apply(lambda x:' '+x). sum().tolist()
     list_column=[colum.strip().lower().replace(' ','_')for colum in list_column]
     
-    df =df[3:]
+    df = df[3:]
     df.columns = list_column
     
     df= df.fillna(method= 'ffill')
-    df.principales_palabras_claves = df.principales_palabras_claves.apply(
+    df.principales_palabras_clave = df.principales_palabras_clave.apply(
         lambda words: ' ' + words
     )
     
@@ -31,14 +31,13 @@ def ingest_data():
         'cantidad_de_palabras_clave',
         'porcentaje_de_palabras_clave'        
     ], as_index =False)
-    [['principales_palabras_claves']].sum()
+    [['principales_palabras_clave']].sum()
     
-    df.principales_palabras_claves =df.principales_palabras_claves.str.replace(".","",regex=True)
-    df.principales_palabras_claves =df.principales_palabras_claves.str.replace ("  "," ")
-    df.principales_palabras_claves =df.principales_palabras_claves.str.replace (" "," ")
-    df.principales_palabras_claves =df.principales_palabras_claves.str.replace (" "," ")
-    df.principales_palabras_claves =df.principales_palabras_claves.str.strip()
-    
+    df.principales_palabras_clave =df.principales_palabras_clave.str.replace(".","",regex=True)
+    df.principales_palabras_clave =df.principales_palabras_clave.str.replace ("  "," ")
+    df.principales_palabras_clave =df.principales_palabras_clave.str.replace (" "," ")
+    df.principales_palabras_clave =df.principales_palabras_clave.str.replace (" "," ")
+    df.principales_palabras_clave =df.principales_palabras_clave.str.strip()
     
     df.porcentaje_de_palabras_clave = df.porcentaje_de_palabras_clave.str.replace('%', '')
     df.porcentaje_de_palabras_clave = df.porcentaje_de_palabras_clave.str.replace(',', '.')
