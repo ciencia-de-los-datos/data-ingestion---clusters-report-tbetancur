@@ -13,31 +13,21 @@ import pandas as pd
 
 
 def ingest_data():
+    df=pd.read_fwf('clusters_report.txt',widths=[9,16,16,77])
+    df=df.fillna(method='ffill')
+    df=df.groupby(df.columns[0]).agg({df.columns[1]: 'first', df.columns[2]: 'first', df.columns[3]: lambda x: ' '.join(x)}).reset_index()
+    df=df.rename(columns={'Cluster':'cluster','Cantidad de':'cantidad_de_palabras_clave','Porcentaje de':'porcentaje_de_palabras_clave','Principales palabras clave':'principales_palabras_clave'})
+    df.drop(0,axis=0,inplace=True)
+    
+    df['cluster'] = df['cluster'].astype(int)
+    df = df.sort_values('cluster')
+    df['cantidad_de_palabras_clave'] = df['cantidad_de_palabras_clave'].astype(int)
 
-    df = pd.read_fwf('clusters_report.txt', colspecs=[(3,5),(9,14),(25,29),(40,119)], header = None)
-    df.head(10)
-    
-    df.drop(df.index[:3], inplace=True)
-    df.reset_index(drop=True, inplace=True)
-    
-    df_f= pd.DataFrame
-    df_f['cluster'] =df[0]
-    df_f['cantidad_de_palabras_clave'] = df[1]
-    df_f['porcentaje_de_palabras_clave'] =df[2].str.replace(',','.')
-    df_f.dropna(inplace=True)
-    
-    df_f.reset_index(drop=True,inplace=True)
-    df_f['cluster'] = df_f['cluster'].str.strip().astype(int)
-    df_f['cantidad_de_palabras_clave'] = df_f['cantidad_de_palabras_clave'].str.strip().astype(int)
-    df_f['porcentaje_de_palabras_clave'] = df_f['porcentaje_de_palabras_clave'].str.strip().astype(float)
-               
-    words =[]
-    [words.append(i) for i in df[3]]
-    key_word = ' '.join(words).replace('control multi', 'control.multi')
-    Words_1 = []
-    [Words_1.append(i.strip()) for i in key_word[:-1].split('.')]
-    
-    df_f['principales_palabras_clave'] = pd.concat([pd.Series(i) for i in Words_1]).reset_index(drop=True)
-    df_f['principales_palabras_clave'] = df_f['principales_palabras_clave'].str.replace(' ,', ',').replace(',',', ').str.replace('   ',' ').str.replace('  ',' ').str.strip('\n').str.replace('  ', ' ')
+    df['porcentaje_de_palabras_clave']=df['porcentaje_de_palabras_clave'].str.replace('%', '', regex=True)
+    df['porcentaje_de_palabras_clave'] = df['porcentaje_de_palabras_clave'].str.replace(',', '.', regex=True).astype(float)
 
-    return df_f
+    df['principales_palabras_clave']=df['principales_palabras_clave'].str.replace('\s+', ' ', regex=True)
+    df['principales_palabras_clave']=df['principales_palabras_clave'].str.replace(',+', ',', regex=True)
+    df['principales_palabras_clave'] = df['principales_palabras_clave'].apply(lambda x: x.replace('.', ''))
+
+    return df
